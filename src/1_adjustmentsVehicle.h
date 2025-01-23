@@ -65,7 +65,7 @@
 //#include "vehicles/Chevy468.h" // Chevy 468 big block V8
 
 // EU cars --------
-//#include "vehicles/VwBeetle.h" // VW Käfer / Beetle
+#include "vehicles/VwBeetle.h" // VW Käfer / Beetle
 //#include "vehicles/JaguarXJS.h" // Jaguar XJS V12, manual transmission
 //#include "vehicles/JaguarXJSautomatic.h" // Jaguar XJS V12, automatic transmission
 //#include "vehicles/MGBGtV8.h" // MGB GT V8, manual transmission
@@ -87,7 +87,7 @@
 //#include "vehicles/DefenderV8OpenPipe.h" // Land Rover Defender 90 V8 manual, open pipes (optimised for smaller speakers)
 //#include "vehicles/DefenderV8CrawlerAutomatic.h" // Land Rover Defender 90 V8 automatic crawler
 //#include "vehicles/DefenderTd5.h" // Land Rover Defender 90 Td5 R5 Diesel
-#include "vehicles/Defender62LS3.h" // Land Rover Defender "Spectre" with Chevy LS3 V8
+//#include "vehicles/Defender62LS3.h" // Land Rover Defender "Spectre" with Chevy LS3 V8
 
 // Asian SUV --------
 //#include "vehicles/LandcruiserFJ40.h" // Landcruiser Fj40 with inline 6 petrol engine
