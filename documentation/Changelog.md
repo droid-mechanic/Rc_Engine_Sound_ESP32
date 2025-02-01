@@ -4,6 +4,9 @@
 - Remove in vehicle files: XENON_LIGHTS, LED_INDICATORS, INDICATOR_DIR, doubleFlashBlueLight
 - Add to EEPROM & select box: DOUBLE_CLUTCH and other transmission options
 
+### 9.14.0-b4
+- 7_Servos.h: SERVOS_HYDRAULIC_EXCAVATOR mode added. This allows to use non linear control curves for hydraulic valves, which eliminate the "dead zone" of most hydraulic valves. The curves are stored in curves.h. Also see servoCurves.xlsx
+
 ### 9.14.0-b3
 - Volvo EC550EL excavator sounds added
 - CH 1 - 4 servo outputs now usable for bucket, dipper, boom and swing in EXCAVATOR_MODE, including simulation of virtual inertia
