@@ -499,6 +499,20 @@ typedef struct struct_message { // This is the data packet
 struct_message trailerData;
 #endif // --------------------------------------------------------------------------
 
+//EspNow Remote defs
+#if defined ESPNOW_REMOTE
+
+typedef struct struct_message
+{ // This is the data packet
+  uint8_t axisX;
+  bool button1;
+} struct_message;
+
+// Create a struct_message called trailerData
+struct_message remoteData;
+
+#endif
+
 // DEBUG stuff
 volatile uint8_t coreId = 99;
 
@@ -1475,6 +1489,16 @@ void setupBattery() {
   Serial.printf("-------------------------------------\n");
 }
 
+//EspNow Remote
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
+{
+  memcpy(&remoteData, incomingData, sizeof(struct_message));
+
+  Serial.print("Axis X: ");
+  Serial.println(remoteData.axisX);
+  Serial.println();
+}
+
 //
 // =======================================================================================================
 // MAIN ARDUINO SETUP (1x during startup)
@@ -1620,6 +1644,23 @@ void setup() {
   sumd.begin(COMMAND_RX); // begin SUMD communication with compatible receivers
   setupMcpwm(); // mcpwm servo output setup
 
+#elif defined ESPNOW_REMOTE
+  // Set device as a Wi-Fi Station for ESP-NOW
+  WiFi.mode(WIFI_STA); // WIFI_STA = Station (router required) WIFI_AP = ESP32 is an access point for stations
+  WiFi.setTxPower (WIFI_POWER_MINUS_1dBm); // Set power to lowest possible value WIFI_POWER_MINUS_1dBm  WIFI_POWER_19_5dBm
+  // shut down wifi
+  WiFi.disconnect();
+
+  // Init ESP-NOW
+  if (esp_now_init() != ESP_OK)
+  {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Once ESPNow is successfully Init, we will register for recv CB to get recv packer info
+  esp_now_register_recv_cb(OnDataRecv);
+
 #else
   // PWM ----
 #define PWM_COMMUNICATION
@@ -1716,6 +1757,8 @@ void setup() {
 
 #elif defined PPM_COMMUNICATION
   readPpmCommands();
+#elif defined ESPNOW_REMOTE
+
 #else
   // measure PWM RC signals mark space ratio
   readPwmSignals();
@@ -4549,6 +4592,8 @@ void loop() {
   readPpmCommands(); // PPM communication (pin 36)
   mcpwmOutput(); // PWM servo signal output
 
+#elif defined ESPNOW_REMOTE
+  mcpwmOutput();
 #else
   // measure RC signals mark space ratio
   readPwmSignals();
