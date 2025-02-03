@@ -505,7 +505,11 @@ struct_message trailerData;
 typedef struct struct_message
 { // This is the data packet
   uint8_t axisX;
+  uint8_t axisY;
   bool button1;
+  bool button2;
+  bool button3;
+  bool button4;
 } struct_message;
 
 // Create a struct_message called trailerData
@@ -1494,9 +1498,15 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
 
-  Serial.print("Axis X: ");
-  Serial.println(remoteData.axisX);
-  Serial.println();
+  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 steering
+
+  pulseWidthRaw[3] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH3 throttle & brake
+
+  // Normalize, auto zero and reverse channels
+  processRawChannels();
+
+  Serial.print("Axis Y: ");
+  Serial.println(remoteData.axisY);
 }
 
 //
