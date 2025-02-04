@@ -1502,11 +1502,17 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 
   pulseWidthRaw[3] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH3 throttle & brake
 
+  jakeBrakeRequest = remoteData.button1;
+  if (remoteData.button2) {
+      hornTrigger = true;
+      hornLatch = true;
+    }
+    else {
+      hornTrigger = false;
+    }
+
   // Normalize, auto zero and reverse channels
   processRawChannels();
-
-  Serial.print("Axis Y: ");
-  Serial.println(remoteData.axisY);
 }
 
 //
@@ -2778,7 +2784,7 @@ void engineOnOff() {
 
 
 #ifdef AUTO_ENGINE_ON_OFF
-  if (millis() - idleDelayMillis > 15000) {
+  if (millis() - idleDelayMillis > 5000) {
     engineOn = false; // after delay, switch engine off
   }
 #endif
@@ -3871,7 +3877,7 @@ void rcTriggerRead() {
 
   // Jake brake as long as in position, if dual rate @100% -----
 #ifdef JAKE_BRAKE_SOUND
-  jakeBrakeRequest = functionR100d.momentary(pulseWidth[5], 2000) && currentRpm > jakeBrakeMinRpm;
+  //jakeBrakeRequest = functionR100d.momentary(pulseWidth[5], 2000) && currentRpm > jakeBrakeMinRpm;
 #endif
 
   // Volume adjustment, if vehicle standing still and dual rate @100%

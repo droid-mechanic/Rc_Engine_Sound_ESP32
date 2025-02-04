@@ -10,7 +10,7 @@
 //#include "vehicles/CaboverCAT3408.h" // Cabover truck with Caterpillar 3408 V8 Diesel
 //#include "vehicles/PeterbiltDetroit8v92.h" // Peterbilt 359 with Detroit 8V92 V8 2 stroke Diesel
 //#include "vehicles/KenworthW900ADetroit8V71.h" // Kenworth W900A with Detroit 8V71 V8 2 stroke Diesel
-//#include "vehicles/KenworthW900ACAT3408.h" // Kenworth W900A with Caterpillar 3408 V8 Diesel (King Hauler)
+#include "vehicles/KenworthW900ACAT3408.h" // Kenworth W900A with Caterpillar 3408 V8 Diesel (King Hauler)
 //#include "vehicles/CAT3408OpenPipes.h" // Kenworth W900A with Caterpillar 3408 V8 Diesel and open pipes
 //#include "vehicles/KenworthW900ACAT3408new.h" // Kenworth W900A with Caterpillar 3408 V8 Diesel (good bass speaker required)
 //#include "vehicles/KenworthCummins335.h" // 1950ies Kenworth with Cummins 335 R6 Diesel
@@ -65,7 +65,7 @@
 //#include "vehicles/Chevy468.h" // Chevy 468 big block V8
 
 // EU cars --------
-#include "vehicles/VwBeetle.h" // VW Käfer / Beetle
+//#include "vehicles/VwBeetle.h" // VW Käfer / Beetle
 //#include "vehicles/JaguarXJS.h" // Jaguar XJS V12, manual transmission
 //#include "vehicles/JaguarXJSautomatic.h" // Jaguar XJS V12, automatic transmission
 //#include "vehicles/MGBGtV8.h" // MGB GT V8, manual transmission

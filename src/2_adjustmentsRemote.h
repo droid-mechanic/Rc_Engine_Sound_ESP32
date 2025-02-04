@@ -107,7 +107,7 @@ boolean channelReversed[14] = {
   false, // CH0 (unused)
   false, // CH1
   false, // CH2
-  false, // CH3
+  true, // CH3
   false, // CH4
   true,  // CH5
   false, // CH6
@@ -144,7 +144,7 @@ const uint16_t pulseSpan = 480;
 
 // Automatic or manual modes -----
 //#define AUTO_LIGHTS
-//#define AUTO_ENGINE_ON_OFF
+#define AUTO_ENGINE_ON_OFF
 //#define AUTO_INDICATORS
 
 // SBUS mode ----
