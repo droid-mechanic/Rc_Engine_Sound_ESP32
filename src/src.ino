@@ -99,6 +99,8 @@ float batteryVolts();
 #include <FastLED.h>        // https://github.com/FastLED/FastLED        <<------- required for Neopixel support. Use V3.3.3
 #include <ESP32AnalogRead.h>// https://github.com/madhephaestus/ESP32AnalogRead <<------- required for battery voltage measurement
 #include <Tone32.h>         // https://github.com/lbernstone/Tone32      <<------- required for battery cell detection beeps
+#include "Adafruit_MCP23X17.h"
+#include "Wire.h"
 
 // Additional headers (included)
 #include "src/curves.h"    // Nonlinear throttle curve arrays
@@ -502,10 +504,19 @@ struct_message trailerData;
 //EspNow Remote defs
 #if defined ESPNOW_REMOTE
 
+Adafruit_MCP23X17 mcp;
+
 typedef struct struct_message
 { // This is the data packet
   uint8_t axisX;
   uint8_t axisY;
+  uint8_t axisLX;
+  uint8_t axisLY;
+  bool l1;
+  bool l2;
+  bool r1;
+  bool r2;
+  uint8_t dpad;
   bool button1;
   bool button2;
   bool button3;
@@ -514,6 +525,24 @@ typedef struct struct_message
 
 // Create a struct_message called trailerData
 struct_message remoteData;
+
+#define pivot0 15
+#define pivot1 14
+#define mainBoom0 9
+#define mainBoom1 8
+#define dipper0 0
+#define dipper1 1
+#define tiltAttach0 3
+#define tiltAttach1 2
+#define thumb0 11
+#define thumb1 10
+#define auxAttach0 12
+#define auxAttach1 13
+
+#define leftMotor0 7
+#define leftMotor1 6
+#define rightMotor0 4
+#define rightMotor1 5
 
 #endif
 
@@ -1498,21 +1527,135 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
 
-  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 steering
+  //Boom
+  processBoom(remoteData.axisLY);
+  //Pivot
+  processPivot(remoteData.axisLX);
+  //Dipper
+  processDipper(remoteData.axisY);
+  //TiltAttach
+  processBucket(remoteData.axisX);
+  //Aux
+  processAux(remoteData.dpad);
 
-  pulseWidthRaw[3] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH3 throttle & brake
+  processDrive(remoteData.l1, remoteData.l2, remoteData.r1, remoteData.r2);
 
-  jakeBrakeRequest = remoteData.button1;
-  if (remoteData.button2) {
-      hornTrigger = true;
-      hornLatch = true;
-    }
-    else {
-      hornTrigger = false;
-    }
+  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 bucket
+
+  pulseWidthRaw[2] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH2 dipper 
+
+  pulseWidthRaw[5] = map(remoteData.axisLY, 0, 256, 1000, 2000); //Ch5 boom
+
+  if (remoteData.l1)
+  {
+    pulseWidthRaw[6] = 1000;
+  } else if (remoteData.l2)
+  {
+    pulseWidthRaw[6] = 2000;
+  } else {
+    pulseWidthRaw[6] = 1500;
+  }
 
   // Normalize, auto zero and reverse channels
   processRawChannels();
+}
+
+void processDrive(bool l1, bool l2, bool r1, bool r2)
+{
+  if (r1 == 1) {
+    mcp.digitalWrite(rightMotor0, HIGH);
+    mcp.digitalWrite(rightMotor1, LOW);
+  } else if (r2 == 1) {
+    mcp.digitalWrite(rightMotor0, LOW);
+    mcp.digitalWrite(rightMotor1, HIGH);
+  } else if (r1 == 0 || r2 == 0) {
+    mcp.digitalWrite(rightMotor0, LOW);
+    mcp.digitalWrite(rightMotor1, LOW);
+  }
+  if (l1 == 1) {
+    mcp.digitalWrite(leftMotor0, HIGH);
+    mcp.digitalWrite(leftMotor1, LOW);
+  } else if (l2 == 1) {
+    mcp.digitalWrite(leftMotor0, LOW);
+    mcp.digitalWrite(leftMotor1, HIGH);
+  } else if (l1 == 0 || r2 == 0) {
+    mcp.digitalWrite(leftMotor0, LOW);
+    mcp.digitalWrite(leftMotor1, LOW);
+  }
+}
+void processBoom(int axisYValue) {
+  int adjustedValue = axisYValue / 2;
+  if (adjustedValue > 100) {
+    mcp.digitalWrite(mainBoom0, HIGH);
+    mcp.digitalWrite(mainBoom1, LOW);
+  } else if (adjustedValue < -100) {
+    mcp.digitalWrite(mainBoom0, LOW);
+    mcp.digitalWrite(mainBoom1, HIGH);
+  } else {
+    mcp.digitalWrite(mainBoom0, LOW);
+    mcp.digitalWrite(mainBoom1, LOW);
+  }
+}
+void processPivot(int axisYValue) {
+  int adjustedValue = axisYValue / 2;
+  if (adjustedValue > 100) {
+    mcp.digitalWrite(pivot0, HIGH);
+    mcp.digitalWrite(pivot1, LOW);
+  } else if (adjustedValue < -100) {
+    mcp.digitalWrite(pivot0, LOW);
+    mcp.digitalWrite(pivot1, HIGH);
+  } else {
+    mcp.digitalWrite(pivot0, LOW);
+    mcp.digitalWrite(pivot1, LOW);
+  }
+}
+void processDipper(int axisYValue) {
+  int adjustedValue = axisYValue / 2;
+  if (adjustedValue > 100) {
+    mcp.digitalWrite(dipper0, HIGH);
+    mcp.digitalWrite(dipper1, LOW);
+  } else if (adjustedValue < -100) {
+    mcp.digitalWrite(dipper0, LOW);
+    mcp.digitalWrite(dipper1, HIGH);
+  } else {
+    mcp.digitalWrite(dipper0, LOW);
+    mcp.digitalWrite(dipper1, LOW);
+  }
+}
+void processBucket(int axisYValue) {
+  int adjustedValue = axisYValue / 2;
+  if (adjustedValue > 100) {
+    mcp.digitalWrite(tiltAttach0, HIGH);
+    mcp.digitalWrite(tiltAttach1, LOW);
+  } else if (adjustedValue < -100) {
+    mcp.digitalWrite(tiltAttach0, LOW);
+    mcp.digitalWrite(tiltAttach1, HIGH);
+  } else {
+    mcp.digitalWrite(tiltAttach0, LOW);
+    mcp.digitalWrite(tiltAttach1, LOW);
+  }
+}
+void processAux(int dpadValue) {
+  if (dpadValue == 1) {
+    mcp.digitalWrite(thumb0, HIGH);
+    mcp.digitalWrite(thumb1, LOW);
+  } else if (dpadValue == 2) {
+    mcp.digitalWrite(thumb0, LOW);
+    mcp.digitalWrite(thumb1, HIGH);
+  } else {
+    mcp.digitalWrite(thumb0, LOW);
+    mcp.digitalWrite(thumb1, LOW);
+  }
+  if (dpadValue == 4) {
+    mcp.digitalWrite(auxAttach0, HIGH);
+    mcp.digitalWrite(auxAttach1, LOW);
+  } else if (dpadValue == 8) {
+    mcp.digitalWrite(auxAttach0, LOW);
+    mcp.digitalWrite(auxAttach1, HIGH);
+  } else {
+    mcp.digitalWrite(auxAttach0, LOW);
+    mcp.digitalWrite(auxAttach1, LOW);
+  }
 }
 
 //
@@ -1676,6 +1819,15 @@ void setup() {
 
   // Once ESPNow is successfully Init, we will register for recv CB to get recv packer info
   esp_now_register_recv_cb(OnDataRecv);
+
+  // Wire.setPins(21, 22);
+  // Wire.begin();
+
+  mcp.begin_I2C();
+
+  for (int i = 0; i <= 15; i++) {
+    mcp.pinMode(i, OUTPUT);
+  }
 
 #else
   // PWM ----

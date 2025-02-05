@@ -13,6 +13,13 @@ typedef struct struct_message
 { // This is the data packet
   uint8_t axisX;
   uint8_t axisY;
+  uint8_t axisLX;
+  uint8_t axisLY;
+  bool l1;
+  bool l2;
+  bool r1;
+  bool r2;
+  uint8_t dpad;
   bool button1;
   bool button2;
   bool button3;
@@ -48,8 +55,11 @@ void processGamepad(ControllerPtr ctl) {
   int LXValue = ctl->axisX();
   int LYValue = ctl->axisY();
 
-  remoteData.axisX = map(LXValue, -512, 512, 0, 256);
-  remoteData.axisY = map(LYValue, -512, 512, 0, 256);
+  remoteData.axisX = map(LXValue, -512, 511, 0, 256);
+  remoteData.axisY = map(LYValue, -512, 511, 0, 256);
+  remoteData.axisLX = map(ctl->axisLX, -512, 511, 0, 256);
+  remoteData.axisLY = map(ctl->axisLY, -512, 511, 0, 256);
+  remoteData.dpad = ctl->dpad();
   remoteData.button1 = ctl->a();
   remoteData.button2 = ctl->b();
   remoteData.button3 = ctl->x();
