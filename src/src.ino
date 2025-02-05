@@ -192,8 +192,8 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 13, 12, 14, 27, 35, 34 }; // Input 
 #define ROOFLIGHT_PIN 5 // Roof lights (high beam, if "define SEPARATE_FULL_BEAM")
 #define SIDELIGHT_PIN 18 // Side lights (connect roof ligthts here, if "define SEPARATE_FULL_BEAM")
 #define BEACON_LIGHT2_PIN 19 // Blue beacons light
-#define BEACON_LIGHT1_PIN 21 // Blue beacons light
-#define CABLIGHT_PIN 22 // Cabin lights
+//#define BEACON_LIGHT1_PIN 21 // Blue beacons light
+//#define CABLIGHT_PIN 22 // Cabin lights
 
 #define RGB_LEDS_PIN 0 // Pin is used for WS2812 LED control
 
@@ -1750,14 +1750,14 @@ void setup() {
 
 #if not defined SPI_DASHBOARD
   sideLight.begin(SIDELIGHT_PIN, 8, 20000); // Timer 8, 20kHz
-  beaconLight1.begin(BEACON_LIGHT1_PIN, 9, 20000); // Timer 9, 20kHz
+  //beaconLight1.begin(BEACON_LIGHT1_PIN, 9, 20000); // Timer 9, 20kHz
   beaconLight2.begin(BEACON_LIGHT2_PIN, 10, 20000); // Timer 10, 20kHz
 #endif
 
 #if defined THIRD_BRAKELIGHT and not defined RZ7886_DRIVER_MODE
   brakeLight.begin(BRAKELIGHT_PIN, 11, 20000); // Timer 11, 20kHz
 #endif
-  cabLight.begin(CABLIGHT_PIN, 12, 20000); // Timer 12, 20kHz
+  //cabLight.begin(CABLIGHT_PIN, 12, 20000); // Timer 12, 20kHz
 
 #if not defined SPI_DASHBOARD
   shakerMotor.begin(SHAKER_MOTOR_PIN, 13, 20000); // Timer 13, 20kHz
@@ -1820,10 +1820,10 @@ void setup() {
   // Once ESPNow is successfully Init, we will register for recv CB to get recv packer info
   esp_now_register_recv_cb(OnDataRecv);
 
-  // Wire.setPins(21, 22);
-  // Wire.begin();
+  Wire.setPins(21, 22);
+  Wire.begin();
 
-  mcp.begin_I2C();
+  mcp.begin_I2C(0x20, &Wire);
 
   for (int i = 0; i <= 15; i++) {
     mcp.pinMode(i, OUTPUT);
@@ -3061,17 +3061,17 @@ void led() {
 #if not defined TRACKED_MODE  // Normal beacons mode 
   if (blueLightTrigger) {
     if (doubleFlashBlueLight) {
-      beaconLight1.flash(30, 80, 400, 2); // Simulate double flash lights
+      //beaconLight1.flash(30, 80, 400, 2); // Simulate double flash lights
       beaconLight2.flash(30, 80, 400, 2, 330); // Simulate double flash lights (with delay for first pass)
     }
     else {
-      beaconLight1.flash(30, 500, 0, 0); // Simulate rotating beacon lights with short flashes
+      //beaconLight1.flash(30, 500, 0, 0); // Simulate rotating beacon lights with short flashes
       beaconLight2.flash(30, 500, 0, 0, 100); // Simulate rotating beacon lights with short flashes
     }
   }
   else {
     beaconLight2.off();
-    beaconLight1.off();
+    //beaconLight1.off();
   }
 #else // Beacons used for tank cannon fire simulation flash in TRACKED_MODE
   if (cannonFlash) beaconLight1.on();
@@ -3170,7 +3170,7 @@ void led() {
   switch (lightsState) {
 
     case 0: // lights off ---------------------------------------------------------------------
-      cabLight.off();
+      //cabLight.off();
       sideLight.off();
       lightsOn = false;
       headLightsSub(false, false, false, false);
@@ -3199,7 +3199,7 @@ void led() {
       break;
 
     case 3: // roof & side & head lights ---------------------------------------------------------------------
-      cabLight.off();
+      //cabLight.off();
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       lightsOn = true;
       headLightsSub(true, false, true, false);
@@ -3210,7 +3210,7 @@ void led() {
 #ifdef NO_FOGLIGHTS
       lightsState = 5; // Skip foglights
 #endif
-      cabLight.off();
+      //cabLight.off();
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(true, true, true, false);
       brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
@@ -3220,7 +3220,7 @@ void led() {
 #ifdef NO_CABLIGHTS
       lightsState = 0; // Skip cablights
 #endif
-      cabLight.pwm(cabLightsBrightness - crankingDim);
+      //cabLight.pwm(cabLightsBrightness - crankingDim);
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(true, true, true, false);
       brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking

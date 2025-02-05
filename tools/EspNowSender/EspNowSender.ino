@@ -5,7 +5,9 @@
 
 ControllerPtr controller;
 
-uint8_t broadcastAddress1[] = {0xE4, 0x65, 0xB8, 0xD8, 0xD3, 0x1C};
+//uint8_t broadcastAddress1[] = {0xE4, 0x65, 0xB8, 0xD8, 0xD3, 0x1C}; //38 pin
+
+uint8_t broadcastAddress1[] = {0xB0, 0xA7, 0x32, 0x15, 0x0F, 0x58}; //30 pin
 
 esp_now_peer_info_t peerInfo;
 
@@ -52,13 +54,10 @@ void onDisconnectedController(ControllerPtr ctl) {
 }
 
 void processGamepad(ControllerPtr ctl) {
-  int LXValue = ctl->axisX();
-  int LYValue = ctl->axisY();
-
-  remoteData.axisX = map(LXValue, -512, 511, 0, 256);
-  remoteData.axisY = map(LYValue, -512, 511, 0, 256);
-  remoteData.axisLX = map(ctl->axisLX, -512, 511, 0, 256);
-  remoteData.axisLY = map(ctl->axisLY, -512, 511, 0, 256);
+  remoteData.axisX = map(ctl->axisRX(), -512, 511, 0, 256);
+  remoteData.axisY = map(ctl->axisRY(), -512, 511, 0, 256);
+  remoteData.axisLX = map(ctl->axisX(), -512, 511, 0, 256);
+  remoteData.axisLY = map(ctl->axisY(), -512, 511, 0, 256);
   remoteData.dpad = ctl->dpad();
   remoteData.button1 = ctl->a();
   remoteData.button2 = ctl->b();
