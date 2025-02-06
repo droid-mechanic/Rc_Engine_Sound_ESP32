@@ -183,7 +183,7 @@ float curveExponentialThrottle[][2] = {
 // and servoCurves.xlsx
 
 float curveHydraulicValve[][2] = {
-  
+
     {0, 0}, // {input value, output value}
     {1000, 1000},
     {1100, 1025},
@@ -198,21 +198,41 @@ float curveHydraulicValve[][2] = {
     {2000, 2000},
     {3000, 3000} // overload range
 
-/*
-    {0, 0}, // {input value, output value}
-    {1000, 1000},
-    {1100, 1050},
-    {1200, 1100},
-    {1300, 1150},
-    {1400, 1200},
+    /*
+        {0, 0}, // {input value, output value}
+        {1000, 1000},
+        {1100, 1050},
+        {1200, 1100},
+        {1300, 1150},
+        {1400, 1200},
+        {1500, 1500}, // Neutral
+        {1600, 1800},
+        {1700, 1850},
+        {1800, 1900},
+        {1900, 1950},
+        {2000, 2000},
+        {3000, 3000} // overload range
+      */
+};
+
+//
+// =======================================================================================================
+// ARRAY FOR HYDRAULIC PUMP MIXER
+// =======================================================================================================
+//
+
+// See: https://www.youtube.com/watch?v=woLxibQ7H88&list=LL&index=1&t=1523s
+// and servoCurves.xlsx
+
+float curveHydraulicPump[][2] = {
+
+    {0, 2000}, // {input value, output value}
+    {1000, 2000},
+    {1450, 1700},
     {1500, 1500}, // Neutral
-    {1600, 1800},
-    {1700, 1850},
-    {1800, 1900},
-    {1900, 1950},
+    {1550, 1700},
     {2000, 2000},
-    {3000, 3000} // overload range
-  */
+    {3000, 2000} // overload range
 };
 
 //
@@ -229,6 +249,24 @@ uint32_t reMap(float pts[][2], uint32_t input)
   float mm = 0;
 
   for (uint8_t nn = 0; nn < 13; nn++)
+  {
+    if (input >= pts[nn][0] && input <= pts[nn + 1][0])
+    {
+      mm = (pts[nn][1] - pts[nn + 1][1]) / (pts[nn][0] - pts[nn + 1][0]);
+      mm = mm * (input - pts[nn][0]);
+      mm = mm + pts[nn][1];
+      rr = mm;
+    }
+  }
+  return (rr);
+}
+
+uint32_t reMap7(float pts[][2], uint32_t input)
+{
+  uint32_t rr = 0;
+  float mm = 0;
+
+  for (uint8_t nn = 0; nn < 7; nn++)
   {
     if (input >= pts[nn][0] && input <= pts[nn + 1][0])
     {

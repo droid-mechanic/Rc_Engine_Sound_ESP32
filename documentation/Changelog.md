@@ -4,6 +4,12 @@
 - Remove in vehicle files: XENON_LIGHTS, LED_INDICATORS, INDICATOR_DIR, doubleFlashBlueLight
 - Add to EEPROM & select box: DOUBLE_CLUTCH and other transmission options
 
+### 9.14.0-b5
+- Servo stroke limitation bug in EXCAVATOR_MODE fixed
+- Hydraulic pump mixer added
+- eeprom only active, if ENABLE_WIRELESS is defined (configuration website is enabled). This allows to change default values (for exampe servo positions) without changing the eeprom ID, if you don't want to use the website.
+- Initial support for upcoming Pingon 14C excavator added
+
 ### 9.14.0-b4
 - 7_Servos.h: SERVOS_HYDRAULIC_EXCAVATOR mode added. This allows to use non linear control curves for hydraulic valves, which eliminate the "dead zone" of most hydraulic valves. The curves are stored in curves.h. Also see servoCurves.xlsx
 

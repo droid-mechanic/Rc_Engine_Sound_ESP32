@@ -287,21 +287,33 @@ uint16_t CH4_RAMP_TIME = 2000;
 // Hydraulic excavator servo configuration profile -------------------------------------------------------------------------------------------
 #ifdef SERVOS_HYDRAULIC_EXCAVATOR
 
+#define PINGON_MODE // Wheel lift for Pingon excavators
+
+boolean boomDownwardsHydraulic = true; // hydraulic load sound as well for boom downwards
+boolean reverseBoomSoundDirection = true; // reverse sound direction, if needed (for example if hoses can't be swapped)
+
 // Servo frequency
 const uint8_t SERVO_FREQUENCY = 50; // usually 50Hz, some servos may run smoother @ 100Hz
 
 // WARNING: never connect receiver PWM signals to the "CH" pins in BUS communication mode!
 
-// Servo limits
+// Valve servo limits
 uint16_t CH1L = 1100, CH1C = 1500, CH1R = 2000; // CH1 bucket valve
 uint16_t CH2L = 1040, CH2C = 1500, CH2R = 2040; // CH2 dipper valve
 uint16_t CH3L = 960, CH3C = 1500, CH3R = 2060; // CH3 boom valve
-uint16_t CH4L = 1000, CH4C = 1500, CH4R = 2000; // CH4 swing ESC
+
+// Swing ESC limits
+uint16_t CH4L = 1375, CH4C = 1500, CH4R = 1625; // CH4 swing ESC
+
+// Hydraulic pump limits
+uint16_t ESC_L = 1000, ESC_C = 1500, ESC_R = 2000; // ESC output for oil pump
+uint16_t ESC_MIN = 1500;
+uint16_t ESC_MAX = 1800;
 
 // Servo ramp times
 uint16_t CH1_RAMP_TIME = 0; // always 0 for now
 uint16_t CH2_RAMP_TIME = 0; // always 0 for now
 uint16_t CH3_RAMP_TIME = 0; // always 0 for now
-uint16_t CH4_RAMP_TIME = 2000; // 2000 for swing motor protection
+uint16_t CH4_RAMP_TIME = 3000; // 2000 for swing motor protection
 
 #endif
