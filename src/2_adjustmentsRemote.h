@@ -123,9 +123,9 @@ boolean channelReversed[14] = {
 // Channels auto zero adjustment or not (don't use it for channels without spring centered neutral position, switches or unused channels)
 boolean channelAutoZero[14] = {
   false, // CH0 (unused)
-  true,  // CH1
+  false,  // CH1
   false, // CH2
-  true,  // CH3
+  false,  // CH3
   false, // CH4
   false,  // CH5
   false,  // CH6
@@ -144,7 +144,7 @@ const uint16_t pulseSpan = 480;
 
 // Automatic or manual modes -----
 //#define AUTO_LIGHTS
-#define AUTO_ENGINE_ON_OFF
+//#define AUTO_ENGINE_ON_OFF
 //#define AUTO_INDICATORS
 
 // SBUS mode ----

@@ -63,6 +63,10 @@ void processGamepad(ControllerPtr ctl) {
   remoteData.button2 = ctl->b();
   remoteData.button3 = ctl->x();
   remoteData.button4 = ctl->y();
+  remoteData.l1 = ctl->l1();
+  remoteData.l2 = ctl->l2();
+  remoteData.r1 = ctl->r1();
+  remoteData.r2 = ctl->r2();
 
   esp_err_t result = esp_now_send(0, (uint8_t *) &remoteData, sizeof(struct_message));
 }

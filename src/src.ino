@@ -1526,69 +1526,36 @@ void setupBattery() {
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
-
-  //Boom
-  processBoom(remoteData.axisLY);
-  //Pivot
-  processPivot(remoteData.axisLX);
-  //Dipper
-  processDipper(remoteData.axisY);
-  //TiltAttach
-  processBucket(remoteData.axisX);
-  //Aux
-  processAux(remoteData.dpad);
-
-  processDrive(remoteData.l1, remoteData.l2, remoteData.r1, remoteData.r2);
-
-  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 bucket
-
-  pulseWidthRaw[2] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH2 dipper 
-
-  pulseWidthRaw[5] = map(remoteData.axisLY, 0, 256, 1000, 2000); //Ch5 boom
-
-  if (remoteData.l1)
-  {
-    pulseWidthRaw[6] = 1000;
-  } else if (remoteData.l2)
-  {
-    pulseWidthRaw[6] = 2000;
-  } else {
-    pulseWidthRaw[6] = 1500;
-  }
-
-  // Normalize, auto zero and reverse channels
-  processRawChannels();
 }
 
 void processDrive(bool l1, bool l2, bool r1, bool r2)
 {
-  if (r1 == 1) {
+  if (r1) {
     mcp.digitalWrite(rightMotor0, HIGH);
     mcp.digitalWrite(rightMotor1, LOW);
-  } else if (r2 == 1) {
+  } else if (r2) {
     mcp.digitalWrite(rightMotor0, LOW);
     mcp.digitalWrite(rightMotor1, HIGH);
-  } else if (r1 == 0 || r2 == 0) {
+  } else {
     mcp.digitalWrite(rightMotor0, LOW);
     mcp.digitalWrite(rightMotor1, LOW);
   }
-  if (l1 == 1) {
+  if (l1) {
     mcp.digitalWrite(leftMotor0, HIGH);
     mcp.digitalWrite(leftMotor1, LOW);
-  } else if (l2 == 1) {
+  } else if (l2) {
     mcp.digitalWrite(leftMotor0, LOW);
     mcp.digitalWrite(leftMotor1, HIGH);
-  } else if (l1 == 0 || r2 == 0) {
+  } else {
     mcp.digitalWrite(leftMotor0, LOW);
     mcp.digitalWrite(leftMotor1, LOW);
   }
 }
 void processBoom(int axisYValue) {
-  int adjustedValue = axisYValue / 2;
-  if (adjustedValue > 100) {
+  if (axisYValue > 200) {
     mcp.digitalWrite(mainBoom0, HIGH);
     mcp.digitalWrite(mainBoom1, LOW);
-  } else if (adjustedValue < -100) {
+  } else if (axisYValue < 50) {
     mcp.digitalWrite(mainBoom0, LOW);
     mcp.digitalWrite(mainBoom1, HIGH);
   } else {
@@ -1597,11 +1564,10 @@ void processBoom(int axisYValue) {
   }
 }
 void processPivot(int axisYValue) {
-  int adjustedValue = axisYValue / 2;
-  if (adjustedValue > 100) {
+  if (axisYValue > 200) {
     mcp.digitalWrite(pivot0, HIGH);
     mcp.digitalWrite(pivot1, LOW);
-  } else if (adjustedValue < -100) {
+  } else if (axisYValue < 50) {
     mcp.digitalWrite(pivot0, LOW);
     mcp.digitalWrite(pivot1, HIGH);
   } else {
@@ -1610,11 +1576,10 @@ void processPivot(int axisYValue) {
   }
 }
 void processDipper(int axisYValue) {
-  int adjustedValue = axisYValue / 2;
-  if (adjustedValue > 100) {
+  if (axisYValue> 200) {
     mcp.digitalWrite(dipper0, HIGH);
     mcp.digitalWrite(dipper1, LOW);
-  } else if (adjustedValue < -100) {
+  } else if (axisYValue < 50) {
     mcp.digitalWrite(dipper0, LOW);
     mcp.digitalWrite(dipper1, HIGH);
   } else {
@@ -1623,11 +1588,10 @@ void processDipper(int axisYValue) {
   }
 }
 void processBucket(int axisYValue) {
-  int adjustedValue = axisYValue / 2;
-  if (adjustedValue > 100) {
+  if (axisYValue > 200) {
     mcp.digitalWrite(tiltAttach0, HIGH);
     mcp.digitalWrite(tiltAttach1, LOW);
-  } else if (adjustedValue < -100) {
+  } else if (axisYValue < 50) {
     mcp.digitalWrite(tiltAttach0, LOW);
     mcp.digitalWrite(tiltAttach1, HIGH);
   } else {
@@ -1820,10 +1784,10 @@ void setup() {
   // Once ESPNow is successfully Init, we will register for recv CB to get recv packer info
   esp_now_register_recv_cb(OnDataRecv);
 
-  Wire.setPins(21, 22);
-  Wire.begin();
+  // Wire.setPins(21, 22);
+  // Wire.begin();
 
-  mcp.begin_I2C(0x20, &Wire);
+  mcp.begin_I2C();
 
   for (int i = 0; i <= 15; i++) {
     mcp.pinMode(i, OUTPUT);
@@ -4736,6 +4700,43 @@ void trailerControl() {
 #endif
 }
 
+// BOOTS EXCAVATOR
+
+void DriveMcp()
+{
+//Boom
+  processBoom(remoteData.axisLY);
+  //Pivot
+  processPivot(remoteData.axisLX);
+  //Dipper
+  processDipper(remoteData.axisY);
+  //TiltAttach
+  processBucket(remoteData.axisX);
+  //Aux
+  processAux(remoteData.dpad);
+
+  processDrive(remoteData.l1, remoteData.l2, remoteData.r1, remoteData.r2);
+
+  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 bucket
+
+  pulseWidthRaw[2] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH2 dipper 
+
+  pulseWidthRaw[5] = map(remoteData.axisLY, 0, 256, 1000, 2000); //Ch5 boom
+
+  if (remoteData.l1)
+  {
+    pulseWidthRaw[6] = 1000;
+  } else if (remoteData.l2)
+  {
+    pulseWidthRaw[6] = 2000;
+  } else {
+    pulseWidthRaw[6] = 1500;
+  }
+
+  // Normalize, auto zero and reverse channels
+  processRawChannels();
+}
+
 //
 // =======================================================================================================
 // MAIN LOOP, RUNNING ON CORE 1
@@ -4761,7 +4762,8 @@ void loop() {
   mcpwmOutput(); // PWM servo signal output
 
 #elif defined ESPNOW_REMOTE
-  mcpwmOutput();
+  //mcpwmOutput();
+  DriveMcp();
 #else
   // measure RC signals mark space ratio
   readPwmSignals();
