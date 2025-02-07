@@ -1526,6 +1526,26 @@ void setupBattery() {
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
+
+  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 bucket
+
+  pulseWidthRaw[2] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH2 dipper 
+  pulseWidthRaw[3] = 1100;
+
+  pulseWidthRaw[5] = map(remoteData.axisLY, 0, 256, 1000, 2000); //Ch5 boom
+
+  if (remoteData.l1)
+  {
+    pulseWidthRaw[6] = 1000;
+  } else if (remoteData.l2)
+  {
+    pulseWidthRaw[6] = 2000;
+  } else {
+    pulseWidthRaw[6] = 1500;
+  }
+
+  // Normalize, auto zero and reverse channels
+  processRawChannels();
 }
 
 void processDrive(bool l1, bool l2, bool r1, bool r2)
@@ -4716,25 +4736,6 @@ void DriveMcp()
   processAux(remoteData.dpad);
 
   processDrive(remoteData.l1, remoteData.l2, remoteData.r1, remoteData.r2);
-
-  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 bucket
-
-  pulseWidthRaw[2] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH2 dipper 
-
-  pulseWidthRaw[5] = map(remoteData.axisLY, 0, 256, 1000, 2000); //Ch5 boom
-
-  if (remoteData.l1)
-  {
-    pulseWidthRaw[6] = 1000;
-  } else if (remoteData.l2)
-  {
-    pulseWidthRaw[6] = 2000;
-  } else {
-    pulseWidthRaw[6] = 1500;
-  }
-
-  // Normalize, auto zero and reverse channels
-  processRawChannels();
 }
 
 //
