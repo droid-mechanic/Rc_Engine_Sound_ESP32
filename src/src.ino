@@ -526,6 +526,8 @@ typedef struct struct_message
 // Create a struct_message called trailerData
 struct_message remoteData;
 
+volatile uint8_t loopInt;
+
 #define pivot0 15
 #define pivot1 14
 #define mainBoom0 9
@@ -4724,18 +4726,25 @@ void trailerControl() {
 
 void DriveMcp()
 {
-//Boom
-  processBoom(remoteData.axisLY);
-  //Pivot
-  processPivot(remoteData.axisLX);
-  //Dipper
-  processDipper(remoteData.axisY);
-  //TiltAttach
-  processBucket(remoteData.axisX);
-  //Aux
-  processAux(remoteData.dpad);
+   static uint32_t lastMcpDrive = millis();
 
-  processDrive(remoteData.l1, remoteData.l2, remoteData.r1, remoteData.r2);
+  if (millis() - lastMcpDrive > 100) { 
+    
+    lastMcpDrive = millis();
+
+    //Boom
+    processBoom(remoteData.axisLY);
+    //Pivot
+    processPivot(remoteData.axisLX);
+    //Dipper
+    processDipper(remoteData.axisY);
+    //TiltAttach
+    processBucket(remoteData.axisX);
+    //Aux
+    //processAux(remoteData.dpad);
+
+    processDrive(remoteData.l1, remoteData.l2, remoteData.r1, remoteData.r2);
+  }
 }
 
 //
@@ -4745,6 +4754,8 @@ void DriveMcp()
 //
 
 void loop() {
+
+loopInt++;
 
 #if defined SBUS_COMMUNICATION
   readSbusCommands(); // SBUS communication (pin 36)
