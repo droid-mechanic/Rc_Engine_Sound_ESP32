@@ -135,7 +135,7 @@ volatile int hydraulicPumpVolumePercentage = 120; // Adjust the volume (usually 
 #include "sounds/Caterpillar323Hydraulic2.h" // Caterpillar 323 excavator (slowed down by factor 2)
 
 // Choose the hydraulic fluid flow sound (uncomment the one you want) --------
-volatile int hydraulicFlowVolumePercentage = 120; // Adjust the volume (usually = 120%)
+volatile int hydraulicFlowVolumePercentage = 50; // Adjust the volume (usually = 120%)
 #include "sounds/Caterpillar323HydraulicFlow.h" // Caterpillar 323 excavator
 
 // Choose the track rattle sound (uncomment the one you want) --------

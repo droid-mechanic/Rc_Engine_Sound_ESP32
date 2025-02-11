@@ -526,7 +526,7 @@ typedef struct struct_message
 // Create a struct_message called trailerData
 struct_message remoteData;
 
-volatile uint8_t loopInt;
+volatile uint32_t lastEspnowMillis;
 
 #define pivot0 15
 #define pivot1 14
@@ -1529,12 +1529,15 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
 
+  lastEspnowMillis = millis();
+
   pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 bucket
 
   pulseWidthRaw[2] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH2 dipper 
   pulseWidthRaw[3] = 1100;
 
   pulseWidthRaw[5] = map(remoteData.axisLY, 0, 256, 1000, 2000); //Ch5 boom
+  pulseWidthRaw[8] = map(remoteData.axisY, 0, 256, 1000, 2000); // swing
 
   if (remoteData.l1)
   {
@@ -1545,6 +1548,24 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
   } else {
     pulseWidthRaw[6] = 1500;
   }
+
+  if (remoteData.r1)
+  {
+    pulseWidthRaw[7] = 1000;
+  } else if (remoteData.r2)
+  {
+    pulseWidthRaw[7] = 2000;
+  } else {
+    pulseWidthRaw[7] = 1500;
+  }
+
+  if (remoteData.button2) {
+      hornTrigger = true;
+      hornLatch = true;
+    }
+    else {
+      hornTrigger = false;
+    }
 
   // Normalize, auto zero and reverse channels
   processRawChannels();
@@ -4728,7 +4749,19 @@ void DriveMcp()
 {
    static uint32_t lastMcpDrive = millis();
 
-  if (millis() - lastMcpDrive > 100) { 
+   if (millis() - lastEspnowMillis > 1000)
+   {
+    remoteData.axisLX = 128;
+    remoteData.axisLY = 128;
+    remoteData.axisX = 128;
+    remoteData.axisY = 128;
+    remoteData.l1 = false;
+    remoteData.l2 = false;
+    remoteData.r1 = false;
+    remoteData.r2 = false;
+   }
+
+  if (millis() - lastMcpDrive > 50) { 
     
     lastMcpDrive = millis();
 
@@ -4754,8 +4787,6 @@ void DriveMcp()
 //
 
 void loop() {
-
-loopInt++;
 
 #if defined SBUS_COMMUNICATION
   readSbusCommands(); // SBUS communication (pin 36)
