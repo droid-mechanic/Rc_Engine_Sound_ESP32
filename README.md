@@ -1,3 +1,57 @@
+# Professor Boots RC Excavator Engine Sound instructions
+
+## Code
+
+The code needs to be uploaded to both the ESP32 in the Excavator and a "bridge" ESP32 that connects to the bluetooth controller.  I did this to simplify the changes made to the Sound generator code.
+
+The Excavator code needs to be loaded using Platform.IO. I like [Random Nerd Tutorials](https://randomnerdtutorials.com/vs-code-platformio-ide-esp32-esp8266-arduino/) for installation instructions.
+Once you have PlatformIO installed, Clone this project to your computer:
+
+![](documentation/pictures/GetCode.jpg)
+
+You can open the "bridge" program in Arduino IDE.  You'll need to install Bluepad32.  It's located in /tools/EspNowSender.
+
+You'll need to get the WiFi MAC address of your excavator ESP32. This is different from the Bluetooth MAC address! Use [Random Nerd Tutorials again](https://randomnerdtutorials.com/get-change-esp32-esp8266-mac-address-arduino/)
+
+Open the EspNowSender sketch in the Arduino IDE and set the MAC address to the Excavator's MAC address. This lets them communicate.
+
+![](documentation/pictures/ExCodeSetAddy.jpg)
+
+This sketch uses Bluepad32, so make sure you have that installed and are using the Bluepad32 board definition.
+
+Upload this to the separate "bridge" ESP32. It must be powered while the Excavator is running. It will connect to the controller.
+
+### PlatformIO
+
+Upload the PlatformIO project to the Excavator ESP32. 
+
+![](documentation/pictures/ExCodeLoad.jpg)
+
+## Wiring
+
+The circuit is very simple. You need a PAM8403 amplifier board, speaker, and some resistors.
+
+First, remove your Excavator PCB and add two wires to the bottom where pins 25 and 26 are.
+
+![](ExWiring1.jpg)
+
+The ESP32 generates two separate audio channels on these pins that need mixed together. So we need two mixing resistors at the end of these wires. The values should be between 20K and 30K ohms.
+
+Solder the other ends of the resistors together. This is the mixed audio signal we want to put into the amplifier.
+
+Now you can either add a potentiometer to control the volume, or add some resitance to Ground so that the volume will not be as loud.
+
+![](documentation/pictures/ExWiring2.jpg)
+
+Tie the Power Ground and Signal Ground (upside down T on my board) on the Amplifier together.
+
+Take 5V power from the Excavator Servo headers.
+
+![](documentation/pictures/ExWiring3.jpg)
+![](documentation/pictures/ExWiring4.jpg)
+
+After this is the original DiyGuy999 documentation.
+
 # This is an Arduino RC engine sound & light controller for ESP32
 It's based on the ATmega 328 version: https://github.com/TheDIYGuy999/Rc_Engine_Sound
 and on bitlunis Halloween example: https://github.com/bitluni/MotionPumpkin
