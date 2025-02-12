@@ -33,13 +33,13 @@ The circuit is very simple. You need a PAM8403 amplifier board, speaker, and som
 
 First, remove your Excavator PCB and add two wires to the bottom where pins 25 and 26 are.
 
-![](ExWiring1.jpg)
+![](documentation/pictures/ExWiring1.jpg)
 
 The ESP32 generates two separate audio channels on these pins that need mixed together. So we need two mixing resistors at the end of these wires. The values should be between 20K and 30K ohms.
 
 Solder the other ends of the resistors together. This is the mixed audio signal we want to put into the amplifier.
 
-Now you can either add a potentiometer to control the volume, or add some resitance to Ground so that the volume will not be as loud.
+Now you can either add a potentiometer to control the volume, or add some resitance to Ground so that the volume will not be as loud. I used 10K for a relatively quiet volume.
 
 ![](documentation/pictures/ExWiring2.jpg)
 
@@ -49,6 +49,11 @@ Take 5V power from the Excavator Servo headers.
 
 ![](documentation/pictures/ExWiring3.jpg)
 ![](documentation/pictures/ExWiring4.jpg)
+
+Fritzing sketches (incorrect resistor values!)
+
+![](documentation/pictures/Excavator_board.jpg)
+![](documentation/pictures/Excavator_schem.jpg)
 
 After this is the original DiyGuy999 documentation.
 
