@@ -1,5 +1,11 @@
 # Professor Boots RC Excavator Engine Sound instructions
 
+This is a project to add TheDiyGuy999's ESP32 RC Engine Sound generator code to Professor Boot's RC Excavator model.
+
+https://www.printables.com/model/833291-diy-rc-excavator
+
+https://github.com/TheDIYGuy999/Rc_Engine_Sound_ESP32
+
 ## Code
 
 The code needs to be uploaded to both the ESP32 in the Excavator and a "bridge" ESP32 that connects to the bluetooth controller.  I did this to simplify the changes made to the Sound generator code.
