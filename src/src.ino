@@ -506,6 +506,13 @@ typedef struct struct_message
 { // This is the data packet
   uint8_t axisX;
   uint8_t axisY;
+  uint8_t axisLX;
+  uint8_t axisLY;
+  bool l1;
+  bool l2;
+  bool r1;
+  bool r2;
+  uint8_t dpad;
   bool button1;
   bool button2;
   bool button3;
