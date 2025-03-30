@@ -163,7 +163,7 @@ float batteryVolts();
 //CH6: (indicators, hazards)
 #define PWM_CHANNELS_NUM 6 // Number of PWM signal input pins 6
 const uint8_t PWM_CHANNELS[PWM_CHANNELS_NUM] = { 1, 2, 3, 4, 5, 6}; // Channel numbers
-const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 13, 12, 14, 27, 35, 34 }; // Input pin numbers (pin 34 & 35 only usable as inputs!)
+const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 27, 35, 34 }; // Input pin numbers (pin 34 & 35 only usable as inputs!)
 
 // Output pins -----
 #define ESC_OUT_PIN 33 // connect crawler type ESC here. Not supported in TRACKED_MODE -----
@@ -171,8 +171,8 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 13, 12, 14, 27, 35, 34 }; // Input 
 #define RZ7886_PIN1 33 // RZ7886 motor driver pin 1 (same as ESC_OUT_PIN)
 #define RZ7886_PIN2 32 // RZ7886 motor driver pin 2 (same as BRAKELIGHT_PIN)
 
-#define STEERING_PIN 13 // CH1 output for steering servo (bus communication only)
-#define SHIFTING_PIN 12 // CH2 output for shifting servo (bus communication only)
+#define STEERING_PIN 23 // CH1 output for steering servo (bus communication only)
+#define SHIFTING_PIN 15 // CH2 output for shifting servo (bus communication only)
 #define WINCH_PIN 14 // CH3 output for winch servo (bus communication only)
 #define COUPLER_PIN 27 // CH4 output for coupler (5th. wheel) servo (bus communication only)
 
@@ -182,10 +182,10 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 13, 12, 14, 27, 35, 34 }; // Input 
 #define HEADLIGHT_PIN 3 // 3 = "RX0" pin, (1 = "TX0" is not usable) white headllights
 #endif
 
-#define TAILLIGHT_PIN 15 // Red tail- & brake-lights (combined)
+#define TAILLIGHT_PIN 12 // Red tail- & brake-lights (combined)
 #define INDICATOR_LEFT_PIN 2 // Orange left indicator (turn signal) light
 #define INDICATOR_RIGHT_PIN 4 // Orange right indicator (turn signal) light
-#define FOGLIGHT_PIN 16 // (16 = RX2) Fog lights
+#define FOGLIGHT_PIN 13 // (16 = RX2) Fog lights
 #define REVERSING_LIGHT_PIN 17 // (TX2) White reversing light
 #define ROOFLIGHT_PIN 5 // Roof lights (high beam, if "define SEPARATE_FULL_BEAM")
 #define SIDELIGHT_PIN 18 // Side lights (connect roof ligthts here, if "define SEPARATE_FULL_BEAM")
@@ -201,7 +201,7 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 13, 12, 14, 27, 35, 34 }; // Input 
 #define COUPLER_SWITCH_PIN 32 // switch for trailer coupler sound
 #endif
 
-#define SHAKER_MOTOR_PIN 23 // Shaker motor (shaking truck while idling and engine start / stop)
+//#define SHAKER_MOTOR_PIN 13 // Shaker motor (shaking truck while idling and engine start / stop)
 
 #define DAC1 25 // connect pin25 (do not change the pin) to a 10kOhm resistor
 #define DAC2 26 // connect pin26 (do not change the pin) to a 10kOhm resistor
@@ -1624,7 +1624,7 @@ void setup() {
   cabLight.begin(CABLIGHT_PIN, 12, 20000); // Timer 12, 20kHz
 
 #if not defined SPI_DASHBOARD
-  shakerMotor.begin(SHAKER_MOTOR_PIN, 13, 20000); // Timer 13, 20kHz
+  //shakerMotor.begin(SHAKER_MOTOR_PIN, 13, 20000); // Timer 13, 20kHz
 #endif
 
 #if defined SPI_DASHBOARD
@@ -1668,6 +1668,7 @@ void setup() {
   setupMcpwm(); // mcpwm servo output setup
 
 #elif defined ESPNOW_REMOTE
+  setupMcpwm();
   // Set device as a Wi-Fi Station for ESP-NOW
   WiFi.mode(WIFI_STA); // WIFI_STA = Station (router required) WIFI_AP = ESP32 is an access point for stations
   WiFi.setTxPower (WIFI_POWER_MINUS_1dBm); // Set power to lowest possible value WIFI_POWER_MINUS_1dBm  WIFI_POWER_19_5dBm
@@ -3029,7 +3030,7 @@ void led() {
       sideLight.off();
       lightsOn = false;
       headLightsSub(false, false, false, false);
-      brakeLightsSub(0); // 0 brightness, if not braking
+      //brakeLightsSub(0); // 0 brightness, if not braking
       break;
 
     case 1: // cab lights ---------------------------------------------------------------------
@@ -3040,7 +3041,7 @@ void led() {
 #endif
       sideLight.off();
       headLightsSub(false, false, false, false);
-      brakeLightsSub(0); // 0 brightness, if not braking
+      //brakeLightsSub(0); // 0 brightness, if not braking
       break;
 
     case 2: // cab & roof & side lights ---------------------------------------------------------------------
@@ -3050,7 +3051,7 @@ void led() {
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(false, false, true, true);
       fogLight.off();
-      brakeLightsSub(rearlightParkingBrightness); // () = brightness, if not braking
+      //brakeLightsSub(rearlightParkingBrightness); // () = brightness, if not braking
       break;
 
     case 3: // roof & side & head lights ---------------------------------------------------------------------
@@ -3058,7 +3059,7 @@ void led() {
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       lightsOn = true;
       headLightsSub(true, false, true, false);
-      brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
+      //brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
       break;
 
     case 4: // roof & side & head & fog lights ---------------------------------------------------------------------
@@ -3068,7 +3069,7 @@ void led() {
       cabLight.off();
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(true, true, true, false);
-      brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
+      //brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
       break;
 
     case 5: // cab & roof & side & head & fog lights ---------------------------------------------------------------------
@@ -3078,7 +3079,7 @@ void led() {
       cabLight.pwm(cabLightsBrightness - crankingDim);
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(true, true, true, false);
-      brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
+      //brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
       break;
 
   } // End of state machine
@@ -4617,6 +4618,27 @@ void loop() {
 
 #elif defined ESPNOW_REMOTE
   mcpwmOutput();
+
+  if (pulseWidth[3] > 1600)
+  {
+    indicatorR.off();
+    fogLight.off();
+    indicatorL.pwm(map(pulseWidth[3], 1600, 2000, 0, 255));
+    tailLight.pwm(map(pulseWidth[3], 1600, 2000, 0, 255));
+  } 
+  else if (pulseWidth[3] < 1400)
+  {
+    indicatorL.off();
+    tailLight.off();
+    indicatorR.pwm(map(pulseWidth[3], 1400, 1000, 0, 255));
+    fogLight.pwm(map(pulseWidth[3], 1400, 1000, 0, 255));
+  } else {
+    indicatorL.off();
+    indicatorR.off();
+    fogLight.off();
+    tailLight.off();
+  }
+
 #else
   // measure RC signals mark space ratio
   readPwmSignals();
@@ -4705,7 +4727,7 @@ void Task1code(void *pvParameters) {
     engineOnOff();
 
     // LED control
-    if (autoZeroDone) led();
+    //if (autoZeroDone) led();
 
 #if not defined SPI_DASHBOARD
     // Shaker control
