@@ -172,14 +172,14 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 27, 35, 34 }; // Input 
 #define RZ7886_PIN2 32 // RZ7886 motor driver pin 2 (same as BRAKELIGHT_PIN)
 
 #define STEERING_PIN 23 // CH1 output for steering servo (bus communication only)
-#define SHIFTING_PIN 15 // CH2 output for shifting servo (bus communication only)
+#define SHIFTING_PIN 3 // CH2 output for shifting servo (bus communication only)
 #define WINCH_PIN 14 // CH3 output for winch servo (bus communication only)
 #define COUPLER_PIN 27 // CH4 output for coupler (5th. wheel) servo (bus communication only)
 
 #ifdef PROTOTYPE_36 // switching headlight pin depending on the board variant (do not uncomment it, or it will cause boot issues!)
 #define HEADLIGHT_PIN 0 // White headllights connected to pin D0, which only exists on the 36 pin ESP32 board (causes boot issues, if used!)
 #else
-#define HEADLIGHT_PIN 3 // 3 = "RX0" pin, (1 = "TX0" is not usable) white headllights
+#define HEADLIGHT_PIN 15 // 3 = "RX0" pin, (1 = "TX0" is not usable) white headllights
 #endif
 
 #define TAILLIGHT_PIN 12 // Red tail- & brake-lights (combined)
@@ -452,7 +452,7 @@ uint16_t currentSpeed = 0;                               // 0 - 500 (current ESC
 volatile bool crawlerMode = false;                       // Crawler mode intended for crawling competitons (withouth sound and virtual inertia)
 
 // Lights
-int8_t lightsState = 0;                                  // for lights state machine
+int8_t lightsState = 3;                                  // for lights state machine
 volatile boolean lightsOn = false;                       // Lights on
 volatile boolean headLightsFlasherOn = false;            // Headlights flasher impulse (Lichthupe)
 volatile boolean headLightsHighBeamOn = false;           // Headlights high beam (Fernlicht)
@@ -2160,8 +2160,8 @@ void processRawChannels() {
   }
 
   if (!autoZeroDone) { // Indicators are showing the number of channels, which are out of auto calibration range
-    indicatorL.flash(140, 150, 500, channel);
-    indicatorR.flash(140, 150, 500, channel);
+    //indicatorL.flash(140, 150, 500, channel);
+    //indicatorR.flash(140, 150, 500, channel);
   }
 
 #if defined CHANNEL_AVERAGING // --------------------------------------------------------------------------------
@@ -2885,7 +2885,7 @@ void headLightsSub(bool head, bool fog, bool roof, bool park) {
 #endif // ----
 
   // Fog lights
-  if (!fog) fogLight.off(); else fogLight.pwm(200 - crankingDim);
+  //if (!fog) fogLight.off(); else fogLight.pwm(200 - crankingDim);
 }
 
 // Main LED function --------------------------------------------------------------------------------------
@@ -2955,29 +2955,29 @@ void led() {
       if (indicatorL.flash(375, 375, 0, 0, 0, indicatorFade, indicatorOffBrightness)) indicatorSoundOn = true; // Left indicator
     }
 #if defined INDICATOR_SIDE_MARKERS // Indicators used as US style side markers as well
-    else {
+    /* else {
       if (lightsState > 1) indicatorL.pwm(rearlightDimmedBrightness - crankingDim / 2);
       else indicatorL.off(indicatorFade);
-    }
+    } */
 #else
     else indicatorL.off(indicatorFade);
 #endif
 
-    if (indicatorRon) {
+    /* if (indicatorRon) {
       if (indicatorR.flash(375, 375, 0, 0, 0, indicatorFade, indicatorOffBrightness)) indicatorSoundOn = true; // Left indicator
-    }
+    } */
 #if defined INDICATOR_SIDE_MARKERS // Indicators used as US style side markers as well
-    else {
+    /* else {
       if (lightsState > 1) indicatorR.pwm(rearlightDimmedBrightness - crankingDim / 2);
       else indicatorR.off(indicatorFade);
-    }
+    } */
 #else
     else indicatorR.off(indicatorFade);
 #endif
   }
   else { // Hazard lights on, if no connection to transmitter (serial & SBUS control mode only)
-    if (indicatorL.flash(375, 375, 0, 0, 0, indicatorFade, indicatorOffBrightness)) indicatorSoundOn = true;
-    indicatorR.flash(375, 375, 0, 0, 0, indicatorFade, indicatorOffBrightness);
+    /* if (indicatorL.flash(375, 375, 0, 0, 0, indicatorFade, indicatorOffBrightness)) indicatorSoundOn = true;
+    indicatorR.flash(375, 375, 0, 0, 0, indicatorFade, indicatorOffBrightness); */
   }
 
   // Headlights, tail lights ----
@@ -3050,7 +3050,7 @@ void led() {
 #endif
       sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(false, false, true, true);
-      fogLight.off();
+      //fogLight.off();
       //brakeLightsSub(rearlightParkingBrightness); // () = brightness, if not braking
       break;
 
@@ -4619,19 +4619,19 @@ void loop() {
 #elif defined ESPNOW_REMOTE
   mcpwmOutput();
 
-  if (pulseWidth[3] > 1600)
+  if (escPulseWidth < 1480)
   {
     indicatorR.off();
     fogLight.off();
-    indicatorL.pwm(map(pulseWidth[3], 1600, 2000, 0, 255));
-    tailLight.pwm(map(pulseWidth[3], 1600, 2000, 0, 255));
+    indicatorL.pwm(map(escPulseWidth, 1500, 1000, 120, 255));
+    tailLight.pwm(map(escPulseWidth, 1500, 1000, 120, 255));
   } 
-  else if (pulseWidth[3] < 1400)
+  else if (escPulseWidth > 1520)
   {
     indicatorL.off();
     tailLight.off();
-    indicatorR.pwm(map(pulseWidth[3], 1400, 1000, 0, 255));
-    fogLight.pwm(map(pulseWidth[3], 1400, 1000, 0, 255));
+    indicatorR.pwm(map(escPulseWidth, 1500, 2000, 120, 255));
+    fogLight.pwm(map(escPulseWidth, 1500, 2000, 120, 255));
   } else {
     indicatorL.off();
     indicatorR.off();
@@ -4727,7 +4727,7 @@ void Task1code(void *pvParameters) {
     engineOnOff();
 
     // LED control
-    //if (autoZeroDone) led();
+    if (autoZeroDone) led();
 
 #if not defined SPI_DASHBOARD
     // Shaker control
