@@ -174,7 +174,7 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 27, 35, 34 }; // Input 
 #define STEERING_PIN 23 // CH1 output for steering servo (bus communication only)
 #define SHIFTING_PIN 3 // CH2 output for shifting servo (bus communication only)
 #define WINCH_PIN 14 // CH3 output for winch servo (bus communication only)
-#define COUPLER_PIN 27 // CH4 output for coupler (5th. wheel) servo (bus communication only)
+#define COUPLER_PIN 5 // CH4 output for coupler (5th. wheel) servo (bus communication only)
 
 #ifdef PROTOTYPE_36 // switching headlight pin depending on the board variant (do not uncomment it, or it will cause boot issues!)
 #define HEADLIGHT_PIN 0 // White headllights connected to pin D0, which only exists on the 36 pin ESP32 board (causes boot issues, if used!)
@@ -187,7 +187,7 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 27, 35, 34 }; // Input 
 #define INDICATOR_RIGHT_PIN 4 // Orange right indicator (turn signal) light
 #define FOGLIGHT_PIN 13 // (16 = RX2) Fog lights
 #define REVERSING_LIGHT_PIN 17 // (TX2) White reversing light
-#define ROOFLIGHT_PIN 5 // Roof lights (high beam, if "define SEPARATE_FULL_BEAM")
+#define ROOFLIGHT_PIN 27 // Roof lights (high beam, if "define SEPARATE_FULL_BEAM")
 #define SIDELIGHT_PIN 18 // Side lights (connect roof ligthts here, if "define SEPARATE_FULL_BEAM")
 #define BEACON_LIGHT2_PIN 19 // Blue beacons light
 #define BEACON_LIGHT1_PIN 21 // Blue beacons light
@@ -518,6 +518,8 @@ typedef struct struct_message
   bool button3;
   bool button4;
 } struct_message;
+
+boolean prevLightSwPressed;
 
 // Create a struct_message called trailerData
 struct_message remoteData;
@@ -1505,7 +1507,7 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
 
-  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1000, 2000); // CH1 steering
+  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1200, 2000); // CH1 steering
 
   pulseWidthRaw[3] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH3 throttle & brake
 
@@ -1517,6 +1519,13 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
     else {
       hornTrigger = false;
     }
+
+    if (remoteData.button3 && !prevLightSwPressed){
+      if (lightsState >= 5) lightsState = 0;
+      else lightsState ++;
+    }
+
+    prevLightSwPressed = remoteData.button3;
 
   // Normalize, auto zero and reverse channels
   processRawChannels();
