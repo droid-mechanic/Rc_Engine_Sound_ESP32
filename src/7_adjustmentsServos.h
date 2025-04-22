@@ -84,7 +84,7 @@ const uint8_t SERVO_FREQUENCY = 50; // usually 50Hz, some servos may run smoothe
 const uint16_t CH1L = 900, CH1C = 1600, CH1R = 2200; // CH1 steering left 900, center 1600, right 2200
 const uint16_t CH2L = 1900, CH2C = 1000, CH2R = 1000; // CH2 transmission gear 1 1900, 2 1000, 3 1000
 const uint16_t CH3L = 2000, CH3C = 1500, CH3R = 1000; // CH3 winch pull, off, release
-const uint16_t CH4L = 1300, CH4R = 1700; // CH4 trailer coupler (5th. wheel) locked, unlocked
+const uint16_t CH4L = 1300, CH4R = 1900; // CH4 trailer coupler (5th. wheel) locked, unlocked
 
 // Servo ramp time 
 const uint16_t STEERING_RAMP_TIME = 0; // 0 = fastest speed, enlarge it to around 3000 for "scale" servo movements

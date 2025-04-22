@@ -163,7 +163,7 @@ float batteryVolts();
 //CH6: (indicators, hazards)
 #define PWM_CHANNELS_NUM 6 // Number of PWM signal input pins 6
 const uint8_t PWM_CHANNELS[PWM_CHANNELS_NUM] = { 1, 2, 3, 4, 5, 6}; // Channel numbers
-const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 22, 35, 34 }; // Input pin numbers (pin 34 & 35 only usable as inputs!)
+const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 21, 22, 35, 34 }; // Input pin numbers (pin 34 & 35 only usable as inputs!)
 
 // Output pins -----
 #define ESC_OUT_PIN 33 // connect crawler type ESC here. Not supported in TRACKED_MODE -----
@@ -173,7 +173,7 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 22, 35, 34 }; // Input 
 
 #define STEERING_PIN 23 // CH1 output for steering servo (bus communication only)
 #define SHIFTING_PIN 3 // CH2 output for shifting servo (bus communication only)
-#define WINCH_PIN 14 // CH3 output for winch servo (bus communication only)
+#define WINCH_PIN 21 // CH3 output for winch servo (bus communication only)
 #define COUPLER_PIN 22 // CH4 output for coupler (5th. wheel) servo (bus communication only)
 
 #ifdef PROTOTYPE_36 // switching headlight pin depending on the board variant (do not uncomment it, or it will cause boot issues!)
@@ -190,7 +190,7 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 14, 22, 35, 34 }; // Input 
 #define ROOFLIGHT_PIN 27 // Roof lights (high beam, if "define SEPARATE_FULL_BEAM")
 #define SIDELIGHT_PIN 18 // Side lights (connect roof ligthts here, if "define SEPARATE_FULL_BEAM")
 #define BEACON_LIGHT2_PIN 19 // Blue beacons light
-#define BEACON_LIGHT1_PIN 21 // Blue beacons light
+#define BEACON_LIGHT1_PIN 14 // Blue beacons light
 #define CABLIGHT_PIN 5 // Cabin lights
 
 #define RGB_LEDS_PIN 0 // Pin is used for WS2812 LED control
@@ -1542,6 +1542,22 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
     else {
       couplingTrigger = false;
       uncouplingTrigger = false;
+    }
+
+    if (remoteData.dpad == 4)
+    {
+      winchPull = true;
+      winchRelease = false;
+    }
+    else if (remoteData.dpad == 8)
+    {
+      winchRelease = true;
+      winchPull = false;
+    }
+    else
+    {
+      winchPull = false;
+      winchRelease = false;
     }
 
     prevLightSwPressed = remoteData.button3;
@@ -4673,7 +4689,7 @@ void loop() {
 #endif
 
   // Horn triggering
-  triggerHorn();
+  //triggerHorn();
 
   // Indicator (turn signal) triggering
   triggerIndicators();
