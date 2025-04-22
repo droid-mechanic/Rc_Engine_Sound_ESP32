@@ -502,21 +502,15 @@ struct_message trailerData;
 //EspNow Remote defs
 #if defined ESPNOW_REMOTE
 
-typedef struct struct_message
-{ // This is the data packet
-  uint8_t axisX;
-  uint8_t axisY;
-  uint8_t axisLX;
-  uint8_t axisLY;
-  bool l1;
-  bool l2;
-  bool r1;
-  bool r2;
+typedef struct struct_message {
+  uint32_t receiverIndex;
+  uint16_t buttons;
   uint8_t dpad;
-  bool button1;
-  bool button2;
-  bool button3;
-  bool button4;
+  int32_t axisX, axisY;
+  int32_t axisRX, axisRY;
+  uint32_t brake, throttle;
+  uint16_t miscButtons;
+  bool thumbR, thumbL, r1, l1, r2, l2;
 } struct_message;
 
 boolean prevLightSwPressed;
@@ -1507,12 +1501,12 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
 
-  pulseWidthRaw[1] = map(remoteData.axisX, 0, 256, 1200, 2000); // CH1 steering
+  pulseWidthRaw[1] = map(remoteData.axisX, -511, 512, 1200, 2000); // CH1 steering
 
-  pulseWidthRaw[3] = map(remoteData.axisY, 0, 256, 1000, 2000); // CH3 throttle & brake
+  pulseWidthRaw[3] = map(remoteData.axisY, -511, 512, 1000, 2000); // CH3 throttle & brake
 
-  jakeBrakeRequest = remoteData.button1;
-  if (remoteData.button2) {
+  jakeBrakeRequest = remoteData.buttons & 1;
+  if (remoteData.buttons & 2) {
       hornTrigger = true;
       hornLatch = true;
     }
@@ -1520,7 +1514,7 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
       hornTrigger = false;
     }
 
-    if (remoteData.button3 && !prevLightSwPressed){
+    if (remoteData.buttons & 4 && !prevLightSwPressed){
       if (lightsState >= 5) lightsState = 0;
       else lightsState ++;
     }
@@ -1560,7 +1554,7 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
       winchRelease = false;
     }
 
-    prevLightSwPressed = remoteData.button3;
+    prevLightSwPressed = remoteData.buttons & 4;
 
   // Normalize, auto zero and reverse channels
   processRawChannels();
