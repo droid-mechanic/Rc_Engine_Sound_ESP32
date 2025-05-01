@@ -69,7 +69,7 @@ float batteryVolts();
 #include "10_adjustmentsTrailer.h"      // <<------- Trailer related adjustments
 
 // DEBUG options can slow down the playback loop! Only uncomment them for debugging, may slow down your system!
-#define CHANNEL_DEBUG // uncomment it for input signal & general debugging informations
+//#define CHANNEL_DEBUG // uncomment it for input signal & general debugging informations
 //#define ESC_DEBUG // uncomment it to debug the ESC
 //#define AUTO_TRANS_DEBUG // uncomment it to debug the automatic transmission
 //#define MANUAL_TRANS_DEBUG // uncomment it to debug the manual transmission
@@ -1500,7 +1500,9 @@ void setupBattery() {
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 {
   memcpy(&remoteData, incomingData, sizeof(struct_message));
-
+  if (remoteData.receiverIndex != 0)
+    return;
+  
   pulseWidthRaw[1] = map(remoteData.axisX, -511, 512, 1200, 2000); // CH1 steering
 
   pulseWidthRaw[3] = map(remoteData.axisY, -511, 512, 1000, 2000); // CH3 throttle & brake
@@ -1540,18 +1542,11 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
 
     if (remoteData.dpad == 4)
     {
-      winchPull = true;
-      winchRelease = false;
+      Serial.println(2);
     }
     else if (remoteData.dpad == 8)
     {
-      winchRelease = true;
-      winchPull = false;
-    }
-    else
-    {
-      winchPull = false;
-      winchRelease = false;
+      Serial.println(1);
     }
 
     prevLightSwPressed = remoteData.buttons & 4;
