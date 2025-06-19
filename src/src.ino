@@ -166,10 +166,10 @@ const uint8_t PWM_CHANNELS[PWM_CHANNELS_NUM] = { 1, 2, 3, 4, 5, 6}; // Channel n
 const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 21, 22, 35, 34 }; // Input pin numbers (pin 34 & 35 only usable as inputs!)
 
 // Output pins -----
-#define ESC_OUT_PIN 33 // connect crawler type ESC here. Not supported in TRACKED_MODE -----
+#define ESC_OUT_PIN 17 // connect crawler type ESC here. Not supported in TRACKED_MODE -----
 
-#define RZ7886_PIN1 33 // RZ7886 motor driver pin 1 (same as ESC_OUT_PIN)
-#define RZ7886_PIN2 32 // RZ7886 motor driver pin 2 (same as BRAKELIGHT_PIN)
+#define RZ7886_PIN1 17 // RZ7886 motor driver pin 1 (same as ESC_OUT_PIN)
+#define RZ7886_PIN2 18 // RZ7886 motor driver pin 2 (same as BRAKELIGHT_PIN)
 
 #define STEERING_PIN 23 // CH1 output for steering servo (bus communication only)
 #define SHIFTING_PIN 3 // CH2 output for shifting servo (bus communication only)
@@ -186,9 +186,9 @@ const uint8_t PWM_PINS[PWM_CHANNELS_NUM] = { 23, 15, 21, 22, 35, 34 }; // Input 
 #define INDICATOR_LEFT_PIN 2 // Orange left indicator (turn signal) light
 #define INDICATOR_RIGHT_PIN 4 // Orange right indicator (turn signal) light
 #define FOGLIGHT_PIN 13 // (16 = RX2) Fog lights
-#define REVERSING_LIGHT_PIN 17 // (TX2) White reversing light
+#define REVERSING_LIGHT_PIN 33 // (TX2) White reversing light
 #define ROOFLIGHT_PIN 27 // Roof lights (high beam, if "define SEPARATE_FULL_BEAM")
-#define SIDELIGHT_PIN 18 // Side lights (connect roof ligthts here, if "define SEPARATE_FULL_BEAM")
+#define SIDELIGHT_PIN 32 // Side lights (connect roof ligthts here, if "define SEPARATE_FULL_BEAM")
 #define BEACON_LIGHT2_PIN 19 // Blue beacons light
 #define BEACON_LIGHT1_PIN 14 // Blue beacons light
 #define CABLIGHT_PIN 5 // Cabin lights
@@ -3072,7 +3072,7 @@ void led() {
 #else
       cabLight.pwm(cabLightsBrightness - crankingDim);
 #endif
-      sideLight.off();
+      //sideLight.off();
       headLightsSub(false, false, false, false);
       //brakeLightsSub(0); // 0 brightness, if not braking
       break;
@@ -3081,7 +3081,7 @@ void led() {
 #ifndef NO_CABLIGHTS
       cabLight.pwm(cabLightsBrightness - crankingDim);
 #endif
-      sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
+      //sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(false, false, true, true);
       //fogLight.off();
       //brakeLightsSub(rearlightParkingBrightness); // () = brightness, if not braking
@@ -3089,7 +3089,7 @@ void led() {
 
     case 3: // roof & side & head lights ---------------------------------------------------------------------
       cabLight.off();
-      sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
+      //sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       lightsOn = true;
       headLightsSub(true, false, true, false);
       //brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
@@ -3100,7 +3100,7 @@ void led() {
       lightsState = 5; // Skip foglights
 #endif
       cabLight.off();
-      sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
+      //sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(true, true, true, false);
       //brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
       break;
@@ -3110,7 +3110,7 @@ void led() {
       lightsState = 0; // Skip cablights
 #endif
       cabLight.pwm(cabLightsBrightness - crankingDim);
-      sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
+      //sideLight.pwm(constrain(sideLightsBrightness - crankingDim, (sideLightsBrightness / 2), 255));
       headLightsSub(true, true, true, false);
       //brakeLightsSub(rearlightDimmedBrightness); // 50 brightness, if not braking
       break;
@@ -4656,20 +4656,26 @@ void loop() {
   {
     indicatorR.off();
     fogLight.off();
+    sideLight.off();
     indicatorL.pwm(map(escPulseWidth, 1500, 1000, 120, 255));
     tailLight.pwm(map(escPulseWidth, 1500, 1000, 120, 255));
+    reversingLight.pwm(map(escPulseWidth, 1500, 1000, 120, 255));
   } 
   else if (escPulseWidth > 1520)
   {
     indicatorL.off();
     tailLight.off();
+    reversingLight.off();
     indicatorR.pwm(map(escPulseWidth, 1500, 2000, 120, 255));
     fogLight.pwm(map(escPulseWidth, 1500, 2000, 120, 255));
+    sideLight.pwm(map(escPulseWidth, 1500, 2000, 120, 255));
   } else {
     indicatorL.off();
     indicatorR.off();
     fogLight.off();
     tailLight.off();
+    reversingLight.off();
+    sideLight.off();
   }
 
 #else
